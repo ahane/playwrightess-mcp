@@ -701,6 +701,55 @@ node dist/cli.js stop
 
 ---
 
+## Workflow 11: Multi-Session Role Testing
+
+**Use Case:** Test different user roles or scenarios in parallel
+
+**Why Stateful:** Each session maintains independent login state for different users, allowing parallel role testing without complex test orchestration.
+
+### Workflow Steps
+
+```bash
+# Setup: Start multiple sessions
+node dist/cli.js start --session admin
+node dist/cli.js start --session user
+node dist/cli.js start --session guest
+
+# Admin: Login with admin credentials
+node dist/cli.js eval "await page.goto('http://app.com/login')" --session admin
+node dist/cli.js eval "await page.fill('#user', 'admin@test.com'); await page.fill('#pass', 'admin'); await page.click('#login')" --session admin
+
+# User: Login with user credentials
+node dist/cli.js eval "await page.goto('http://app.com/login')" --session user
+node dist/cli.js eval "await page.fill('#user', 'user@test.com'); await page.fill('#pass', 'user'); await page.click('#login')" --session user
+
+# Guest: Browse without login
+node dist/cli.js eval "await page.goto('http://app.com')" --session guest
+
+# Test: Verify each role sees correct content
+node dist/cli.js eval "const hasAdminPanel = await page.$('.admin-panel'); console.log('Admin panel visible:', !!hasAdminPanel)" --session admin
+node dist/cli.js eval "const hasAdminPanel = await page.$('.admin-panel'); console.log('Admin panel visible:', !!hasAdminPanel)" --session user
+node dist/cli.js eval "const loginPrompt = await page.$('.login-required'); console.log('Login required:', !!loginPrompt)" --session guest
+
+# Cleanup: Stop all sessions
+node dist/cli.js stop --session admin
+node dist/cli.js stop --session user
+node dist/cli.js stop --session guest
+
+# Or shutdown entire server
+node dist/cli.js shutdown
+```
+
+### Why This Works
+
+- Each session maintains completely isolated state
+- Login cookies don't cross between sessions
+- Can test role-based access control in parallel
+- No test interference or cleanup between roles
+- Sessions can be left running for manual inspection
+
+---
+
 ## Best Practices for Workflows
 
 ### 1. Always Initialize State Objects

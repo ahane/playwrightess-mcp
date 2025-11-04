@@ -431,11 +431,31 @@ await page.pdf({
 });
 ```
 
+## Architecture
+
+### Multi-Session Components
+
+- **src/multi-executor.ts** - Multi-session code execution with AST rewriting
+- **src/multi-session-manager.ts** - Multi-session browser lifecycle management
+- **src/server.ts** - HTTP server managing sessions (port 45123)
+- **src/cli.ts** - Command-line interface with session support
+
+### Legacy Single-Session Components
+
+- **src/executor.ts** - Single-session code execution (legacy)
+- **src/session-manager.ts** - Single-session browser management (legacy)
+
+### Data Storage
+
+- **`.playwright-sessions/<sessionId>/`** - Per-session browser data directories
+- **`.playwright-storage-states/<sessionId>-state.json`** - Per-session cookies/localStorage
+- **`.session-server.pid`** - Background server process ID
+
 ## Limitations
 
-- **Single session:** Only one session can run at a time (singleton pattern)
 - **Variable tracking:** Only specific variables persist (`page`, `browser`, `context`, `sessionManager`)
-- **Memory:** Large `sharedState` objects consume memory
-- **Resources:** Browser stays open consuming resources until stopped
+- **Memory:** Large `sharedState` objects consume memory per session
+- **Resources:** Each session requires separate browser process (resource intensive for many sessions)
+- **Browser stays open:** Consumes resources until explicitly stopped
 - **Sandbox:** Code executes in VM sandbox with limited Node.js APIs
 - **Port:** Uses port 45123 (must be available)
