@@ -1,21 +1,26 @@
 {
-  "name": "playwrightess-mcp",
-  "version": "1.0.0",
-  "description": "MCP server for evaluating Playwright scripts with persistent session state",
-  "main": "dist/index.js",
+  "name": "playwright-stateful",
+  "version": "2.0.0",
+  "description": "Persistent Playwright browser automation with state maintained across code executions",
+  "main": "dist/executor.js",
   "type": "module",
+  "bin": {
+    "playwright-session": "./dist/cli.js"
+  },
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "node dist/cli.js",
     "dev": "tsc --watch",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "session:start": "node dist/cli.js start",
+    "session:stop": "node dist/cli.js stop",
+    "exec": "node dist/cli.js eval"
   },
   "dependencies": {
     "@babel/generator": "^7.28.3",
     "@babel/parser": "^7.28.3",
     "@babel/traverse": "^7.28.3",
     "@babel/types": "^7.28.2",
-    "@modelcontextprotocol/sdk": "^1.0.0",
     "playwright": "^1.40.0"
   },
   "devDependencies": {

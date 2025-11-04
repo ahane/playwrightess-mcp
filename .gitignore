@@ -3,3 +3,7 @@ dist
 .claude
 .mcp.json
 .playwright-session
+.playwright-sessions
+.playwright-storage-states
+.session-server.pid
+shared-storage-state.json
