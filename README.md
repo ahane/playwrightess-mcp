@@ -1,17 +1,23 @@
 # Playwright Stateful - Claude Code Skill
 
-> **Migrated from MCP to Claude Code Skill**
+**A Claude Code skill for persistent, stateful browser automation with Playwright**
+
+> **🎯 What is a Claude Code Skill?**
 >
-> This project was originally a Model Context Protocol (MCP) server. It has been migrated to a Claude Code skill that provides persistent Playwright browser automation with state maintained across code executions.
+> This is a [Claude Code skill](https://docs.anthropic.com/claude/docs/claude-code) that extends Claude's capabilities with persistent browser automation. When Claude uses this skill, it can maintain browser state across multiple operations, enabling complex multi-step workflows.
 
-## What Is This?
+> **📜 Migrated from MCP**
+>
+> Originally a Model Context Protocol (MCP) server, now a standalone Claude Code skill with enhanced multi-session support.
 
-A persistent Playwright browser automation environment where:
-- Browser state is maintained between code executions
-- Variables like `page`, `browser`, `context` persist automatically
-- Multi-step workflows can be built incrementally
-- Login sessions survive between operations
-- Code snippets are executed via AST rewriting for automatic state tracking
+## Features
+
+- **🔄 Persistent State**: Browser state maintained between code executions
+- **🎭 Multi-Session Support**: Run multiple isolated browser contexts simultaneously
+- **🔐 Login Persistence**: Sessions survive between operations
+- **🧩 Incremental Workflows**: Build complex automations step-by-step
+- **⚡ AST Rewriting**: Variables automatically tracked and persisted
+- **🤖 AI-Optimized**: Designed for efficient use by AI agents
 
 ## Installation
 
@@ -21,6 +27,8 @@ npm run build
 ```
 
 ## Quick Start
+
+### Basic Usage
 
 ```bash
 # Start a persistent session (launches browser in background)
@@ -38,22 +46,58 @@ node dist/cli.js stop
 node dist/cli.js shutdown
 ```
 
-## Using as a Claude Code Skill
+### Multi-Session Usage
 
-The skill definition is located at `.claude/skills/playwright-stateful/SKILL.md`.
-
-### For Project-Specific Use
-
-The skill is already in this project's `.claude/skills/` directory and will be available when Claude Code runs in this project.
-
-### For Global Use
-
-To use this skill across all projects:
+Run multiple isolated browser sessions simultaneously:
 
 ```bash
-# Copy the skill to global skills directory
+# Start multiple sessions
+node dist/cli.js start --session admin
+node dist/cli.js start --session user1
+
+# Each session maintains independent state
+node dist/cli.js eval "await page.goto('http://app.com/admin')" --session admin
+node dist/cli.js eval "await page.goto('http://app.com/user')" --session user1
+
+# List active sessions
+node dist/cli.js sessions
+
+# Stop specific sessions
+node dist/cli.js stop --session admin
+node dist/cli.js stop --session user1
+```
+
+## Using as a Claude Code Skill
+
+This project **is** a Claude Code skill. The skill definition is located at `.claude/skills/playwright-stateful/SKILL.md`.
+
+### Using with Claude Code
+
+**Option 1: Project-Specific (Recommended for Development)**
+
+The skill is already in this project's `.claude/skills/` directory. When you use Claude Code in this project, the skill will be automatically available.
+
+**Option 2: Global Installation (Use Anywhere)**
+
+To make this skill available across all projects:
+
+```bash
+# Symlink the skill to your global skills directory
+ln -s "$(pwd)/.claude/skills/playwright-stateful" ~/.claude/skills/playwright-stateful
+
+# Or copy it (updates won't sync)
 cp -r .claude/skills/playwright-stateful ~/.claude/skills/
 ```
+
+### How Claude Uses This Skill
+
+When you ask Claude to perform browser automation tasks:
+
+1. Claude recognizes the need for persistent browser state
+2. Automatically invokes the playwright-stateful skill
+3. Uses the CLI commands to control browser sessions
+4. Maintains state across multiple operations
+5. Can manage multiple sessions for testing different scenarios
 
 ### Project-Specific Browser Scripts
 
@@ -112,10 +156,12 @@ node dist/cli.js stop
 
 ### Components
 
-- **src/executor.ts** - Code execution engine with AST rewriting
-- **src/session-manager.ts** - Browser session lifecycle management
+- **src/multi-executor.ts** - Multi-session code execution with AST rewriting
+- **src/multi-session-manager.ts** - Multiple browser session lifecycle management
+- **src/executor.ts** - Single-session code execution (legacy)
+- **src/session-manager.ts** - Single browser session management (legacy)
 - **src/server.ts** - HTTP server for persistent state
-- **src/cli.ts** - Command-line interface
+- **src/cli.ts** - Command-line interface with session support
 
 ### How It Works
 
@@ -162,35 +208,57 @@ Optimized for AI agent use:
 
 ## Files
 
-- `.claude/skills/playwright-stateful/SKILL.md` - Skill definition
-- `src/executor.ts` - Code execution with AST rewriting
-- `src/session-manager.ts` - Browser lifecycle management
+### Skill Files
+- `.claude/skills/playwright-stateful/SKILL.md` - Main skill definition
+- `.claude/skills/playwright-stateful/REFERENCE.md` - API documentation
+- `.claude/skills/playwright-stateful/WORKFLOWS.md` - Common workflows
+- `.claude/skills/playwright-stateful/PROJECT-SCRIPTS.md` - Project script guide
+- `.claude/skills/playwright-stateful/TROUBLESHOOTING.md` - Problem solving
+
+### Source Files
+- `src/multi-executor.ts` - Multi-session code execution
+- `src/multi-session-manager.ts` - Multi-session browser management
 - `src/server.ts` - Background HTTP server
 - `src/cli.ts` - Command-line interface
+- `src/executor.ts` - Single-session executor (legacy)
+- `src/session-manager.ts` - Single-session manager (legacy)
 - `src/index.ts.mcp-backup` - Original MCP server (archived)
-- `.playwright-session/` - Browser user data directory
-- `shared-storage-state.json` - Saved cookies/localStorage
+
+### Runtime Files
+- `.playwright-sessions/<sessionId>/` - Per-session browser data directories
+- `.playwright-storage-states/<sessionId>-state.json` - Per-session cookies/localStorage
 - `.session-server.pid` - Background server PID
 
 ## Migration from MCP
 
 ### What Changed
 
-- ❌ Removed: `@modelcontextprotocol/sdk` dependency
-- ❌ Removed: MCP server interface (`src/index.ts`)
-- ✅ Added: HTTP server for state persistence (`src/server.ts`)
-- ✅ Added: CLI interface (`src/cli.ts`)
-- ✅ Added: Claude Code skill definition (`.claude/skills/`)
-- ✅ Kept: Code executor with AST rewriting
-- ✅ Kept: Session manager with persistent browser
+**Removed:**
+- ❌ `@modelcontextprotocol/sdk` dependency
+- ❌ MCP server interface (`src/index.ts`)
+- ❌ Single-session limitation
+
+**Added:**
+- ✅ Multi-session support (run multiple isolated browsers)
+- ✅ HTTP server architecture (`src/server.ts`)
+- ✅ CLI interface with session parameters (`src/cli.ts`)
+- ✅ Claude Code skill definition (`.claude/skills/`)
+- ✅ Session management commands (`sessions`, `--session` parameter)
+
+**Kept & Enhanced:**
+- ✅ Code executor with AST rewriting (now multi-session aware)
+- ✅ Browser session management (now supports multiple sessions)
+- ✅ Persistent state across executions
+- ✅ Storage state persistence
 
 ### Why Migrate?
 
-- MCP is deprecated
-- Claude Code skills provide better integration
-- HTTP server is simpler than MCP protocol
-- CLI interface is more versatile
-- Same core functionality with better UX
+- **MCP Deprecated**: Model Context Protocol is no longer supported
+- **Better Integration**: Claude Code skills are the official extension mechanism
+- **Multi-Session**: Can now test multiple user scenarios simultaneously
+- **Simpler**: HTTP server is easier than MCP protocol
+- **More Versatile**: CLI can be used standalone or via Claude
+- **Same Power**: All original functionality preserved and enhanced
 
 ## License
 
