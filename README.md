@@ -69,24 +69,33 @@ node dist/cli.js stop --session user1
 
 ## Using as a Claude Code Skill
 
-This project **is** a Claude Code skill. The skill definition is located at `.claude/skills/playwright-stateful/SKILL.md`.
+This project **is** a Claude Code skill. The skill documentation is located in the `skill/` directory.
 
 ### Using with Claude Code
 
 **Option 1: Project-Specific (Recommended for Development)**
 
-The skill is already in this project's `.claude/skills/` directory. When you use Claude Code in this project, the skill will be automatically available.
+Copy or symlink the skill to this project's `.claude/skills/` directory:
+
+```bash
+# From the project root
+mkdir -p .claude/skills
+ln -s "$(pwd)/skill" .claude/skills/playwright-stateful
+
+# Or copy it
+cp -r skill .claude/skills/playwright-stateful
+```
 
 **Option 2: Global Installation (Use Anywhere)**
 
 To make this skill available across all projects:
 
 ```bash
-# Symlink the skill to your global skills directory
-ln -s "$(pwd)/.claude/skills/playwright-stateful" ~/.claude/skills/playwright-stateful
+# Symlink to your global skills directory
+ln -s "$(pwd)/skill" ~/.claude/skills/playwright-stateful
 
 # Or copy it (updates won't sync)
-cp -r .claude/skills/playwright-stateful ~/.claude/skills/
+cp -r skill ~/.claude/skills/playwright-stateful
 ```
 
 ### How Claude Uses This Skill
@@ -217,12 +226,14 @@ This document explains:
 
 ## Files
 
-### Skill Files
-- `.claude/skills/playwright-stateful/SKILL.md` - Main skill definition
-- `.claude/skills/playwright-stateful/REFERENCE.md` - API documentation
-- `.claude/skills/playwright-stateful/WORKFLOWS.md` - Common workflows
-- `.claude/skills/playwright-stateful/PROJECT-SCRIPTS.md` - Project script guide
-- `.claude/skills/playwright-stateful/TROUBLESHOOTING.md` - Problem solving
+### Skill Files (in `skill/` directory)
+- `skill/SKILL.md` - Main skill definition with development style guide
+- `skill/REFERENCE.md` - Complete API documentation
+- `skill/WORKFLOWS.md` - 10 detailed real-world workflows
+- `skill/PROJECT-SCRIPTS.md` - Project-specific script guide
+- `skill/TROUBLESHOOTING.md` - Problem solving guide
+- `skill/REACT-INSPECTION.md` - React debugging techniques
+- `skill/DISCOVERY.md` - Automatic project script discovery
 
 ### Source Files
 - `src/multi-executor.ts` - Multi-session code execution
