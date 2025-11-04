@@ -206,6 +206,15 @@ Optimized for AI agent use:
 | Resource usage | ⚠️ Higher (persistent) | ✅ Lower (ephemeral) |
 | Use case | Complex workflows | One-off automation |
 
+**📖 For a detailed explanation of statefulness, see [STATEFULNESS.md](./STATEFULNESS.md)**
+
+This document explains:
+- How naive Playwright loses state between executions
+- How this skill maintains persistent browser sessions
+- Technical implementation using AST rewriting and VM contexts
+- Real-world debugging examples showing the difference
+- When to use each approach
+
 ## Files
 
 ### Skill Files
